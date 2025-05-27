@@ -1,0 +1,10 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pkl # Only if model is in Git LFS
+# Node
+node_modules/
+.DS_Store
+# Heroku
+.env
