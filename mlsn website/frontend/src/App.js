@@ -2,26 +2,52 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function App() {
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState(null);
+  const [formData, setFormData] = useState({ val1: '', val2: '', val3: '', val4: '' });
+  const [prediction, setPrediction] = useState(null);
 
-  const handleSubmit = async () => {
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:5000/predict', {
-        input: [parseFloat(input)]  // Adapt this to your model input
+      const values = [
+        parseFloat(formData.val1),
+        parseFloat(formData.val2),
+        parseFloat(formData.val3),
+        parseFloat(formData.val4)
+      ];
+
+      const response = await axios.post('http://localhost:5000/predict', {
+        features: values
       });
-      setResult(response.data.prediction);
-    } catch (err) {
-      console.error(err);
+
+      setPrediction(response.data.prediction);
+    } catch (error) {
+      console.error("Error fetching prediction", error);
     }
   };
 
   return (
-    <div>
-      <h1>ML Prediction</h1>
-      <input type="text" value={input} onChange={e => setInput(e.target.value)} />
-      <button onClick={handleSubmit}>Predict</button>
-      {result && <h2>Result: {result}</h2>}
+    <div className="App">
+      <h2>Enter values for prediction</h2>
+      <form onSubmit={handleSubmit}>
+        <input name="val1" value={formData.val1} onChange={handleChange} placeholder="Value 1" />
+        <input name="val2" value={formData.val2} onChange={handleChange} placeholder="Value 2" />
+        <input name="val3" value={formData.val3} onChange={handleChange} placeholder="Value 3" />
+        <input name="val4" value={formData.val4} onChange={handleChange} placeholder="Value 4" />
+        <button type="submit">Predict</button>
+      </form>
+
+      {prediction !== null && (
+        <div>
+          <h3>Prediction: {prediction}</h3>
+        </div>
+      )}
     </div>
   );
 }
